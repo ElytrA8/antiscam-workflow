@@ -38,7 +38,8 @@ jobs:
          timeout-minutes: 340
          continue-on-error: true
          run: |
-           node index.js
+             cd source
+             node index.js
        - name: Loop workflow
          continue-on-error: true
          run: |

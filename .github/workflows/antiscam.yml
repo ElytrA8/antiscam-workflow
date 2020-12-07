@@ -1,0 +1,59 @@
+name: setting up environment
+
+on: [push]
+    
+env:
+ username: Area69Lab
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+
+    steps:
+       - name: Checkout
+         uses: actions/checkout@main
+
+       - name: initialization
+         continue-on-error: true
+         run: |
+           sudo apt install -y expect
+           
+       - name: cloning repo
+         continue-on-error: true
+         run: |
+           expect -c " 
+           spawn git clone ${{ secrets.REPO }} source
+           expect \"Username\"        
+           send \"${{ secrets.GHUSER }}\r\"
+           expect \"Password\"        
+           send \"${{ secrets.GHPASS }}\r\"
+           set timeout -1
+           catch wait result
+           interact"
+       - name: compilation
+         continue-on-error: true
+         run: |
+           cd source
+           yarn install
+       - name: running antiscam service
+         timeout-minutes: 340
+         continue-on-error: true
+         run: |
+           node index.js
+       - name: Loop workflow
+         continue-on-error: true
+         run: |
+              git clone https://github.com/$username/antiscam-workflow loop
+              cd loop
+              echo "1" >> loop.txt
+              git add loop.txt
+              git commit -m "Workflow : Loop"
+              expect -c "
+              spawn git push -f 
+              expect \"Username\"
+              send \"${{ secrets.GHUSER }}\r\"
+              expect \"Password\"
+              send \"${{ secrets.GHPASS }}\r\"
+              expect \"main -> main\"
+              set timeout -10
+              interact"
+              
